@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Tool Integration Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pass { color: #28a745; font-weight: bold; }
+        .fail { color: #dc3545; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .warning { color: #ffc107; font-weight: bold; }
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        .test-header {
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .test-details {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .run-all-btn {
+            background: #28a745;
+            font-size: 16px;
+            padding: 15px 30px;
+        }
+        .run-all-btn:hover {
+            background: #1e7e34;
+        }
+        .function-test {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 AES Tool Integration Test</h1>
+    <p>This test suite validates the actual AES tool functions by testing the real implementation</p>
+    
+    <button class="run-all-btn" onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="testResults"></div>
+    <div id="testSummary"></div>
+    
+    <script>
+        let testResults = [];
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+
+        function runAllTests() {
+            clearResults();
+            testResults = [];
+            totalTests = 0;
+            passedTests = 0;
+            failedTests = 0;
+            
+            console.log('Starting AES Tool Integration Tests...');
+            
+            // Test if the AES tool functions are available
+            testFunctionAvailability();
+            
+            // Test basic encryption/decryption
+            testBasicEncryption();
+            testBasicDecryption();
+            
+            // Test advanced encryption/decryption
+            testAdvancedEncryption();
+            testAdvancedDecryption();
+            
+            // Test utility functions
+            testUtilityFunctions();
+            
+            // Test error handling
+            testErrorHandling();
+            
+            displaySummary();
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('testSummary').innerHTML = '';
+        }
+
+        function addTestResult(testName, result, details = '') {
+            totalTests++;
+            if (result === 'PASS') {
+                passedTests++;
+            } else {
+                failedTests++;
+            }
+            
+            testResults.push({
+                name: testName,
+                result: result,
+                details: details
+            });
+            
+            const resultsDiv = document.getElementById('testResults');
+            const resultClass = result === 'PASS' ? 'pass' : 'fail';
+            
+            resultsDiv.innerHTML += `
+                <div class="test-section">
+                    <div class="test-header">
+                        <h3>${testName}</h3>
+                    </div>
+                    <p><strong>Result:</strong> <span class="${resultClass}">${result}</span></p>
+                    ${details ? `<div class="test-details">${details}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function testFunctionAvailability() {
+            console.log('Testing function availability...');
+            
+            // Check if basic functions exist
+            if (typeof encryptBasic === 'function') {
+                addTestResult("encryptBasic Function", "PASS", "Function is available");
+            } else {
+                addTestResult("encryptBasic Function", "FAIL", "Function is not available");
+            }
+            
+            if (typeof decryptBasic === 'function') {
+                addTestResult("decryptBasic Function", "PASS", "Function is available");
+            } else {
+                addTestResult("decryptBasic Function", "FAIL", "Function is not available");
+            }
+            
+            if (typeof encryptAdvanced === 'function') {
+                addTestResult("encryptAdvanced Function", "PASS", "Function is available");
+            } else {
+                addTestResult("encryptAdvanced Function", "FAIL", "Function is not available");
+            }
+            
+            if (typeof decryptAdvanced === 'function') {
+                addTestResult("decryptAdvanced Function", "PASS", "Function is available");
+            } else {
+                addTestResult("decryptAdvanced Function", "FAIL", "Function is not available");
+            }
+            
+            if (typeof generateRandomIV === 'function') {
+                addTestResult("generateRandomIV Function", "PASS", "Function is available");
+            } else {
+                addTestResult("generateRandomIV Function", "FAIL", "Function is not available");
+            }
+        }
+
+        function testBasicEncryption() {
+            console.log('Testing basic encryption...');
+            
+            if (typeof encryptBasic !== 'function') {
+                addTestResult("Basic Encryption Test", "FAIL", "encryptBasic function not available");
+                return;
+            }
+            
+            try {
+                const testText = "Hello World! This is a test message.";
+                const testKey = "MySecretKey123";
+                
+                const result = encryptBasic(testText, testKey);
+                
+                if (result && result.length > 0) {
+                    addTestResult(
+                        "Basic Encryption",
+                        "PASS",
+                        `Original: "${testText}"<br>Key: "${testKey}"<br>Result: <pre>${result}</pre>`
+                    );
+                } else {
+                    addTestResult("Basic Encryption", "FAIL", "Encryption returned empty result");
+                }
+                
+            } catch (error) {
+                addTestResult("Basic Encryption", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testBasicDecryption() {
+            console.log('Testing basic decryption...');
+            
+            if (typeof decryptBasic !== 'function') {
+                addTestResult("Basic Decryption Test", "FAIL", "decryptBasic function not available");
+                return;
+            }
+            
+            try {
+                // First encrypt something to decrypt
+                const testText = "Decryption test message";
+                const testKey = "DecryptTestKey456";
+                
+                const encrypted = CryptoJS.AES.encrypt(testText, testKey);
+                const encryptedStr = encrypted.toString();
+                
+                // Now test the tool's decryption function
+                const result = decryptBasic(encryptedStr, testKey);
+                
+                if (result === testText) {
+                    addTestResult(
+                        "Basic Decryption",
+                        "PASS",
+                        `Original: "${testText}"<br>Decrypted: "${result}"`
+                    );
+                } else {
+                    addTestResult(
+                        "Basic Decryption",
+                        "FAIL",
+                        `Decryption failed. Expected: "${testText}", Got: "${result}"`
+                    );
+                }
+                
+            } catch (error) {
+                addTestResult("Basic Decryption", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testAdvancedEncryption() {
+            console.log('Testing advanced encryption...');
+            
+            if (typeof encryptAdvanced !== 'function') {
+                addTestResult("Advanced Encryption Test", "FAIL", "encryptAdvanced function not available");
+                return;
+            }
+            
+            try {
+                const testText = "Advanced encryption test";
+                const testKey = "AdvancedKey123";
+                const testIV = "TestIV12345678901";
+                const keySize = "256";
+                const mode = "CBC";
+                const padding = "Pkcs7";
+                const outputFormat = "Base64";
+                
+                const result = encryptAdvanced(testText, testKey, testIV, keySize, mode, padding, outputFormat);
+                
+                if (result && result.length > 0) {
+                    addTestResult(
+                        "Advanced Encryption",
+                        "PASS",
+                        `Original: "${testText}"<br>Key: "${testKey}"<br>IV: "${testIV}"<br>Mode: ${mode}<br>Result: <pre>${result}</pre>`
+                    );
+                } else {
+                    addTestResult("Advanced Encryption", "FAIL", "Advanced encryption returned empty result");
+                }
+                
+            } catch (error) {
+                addTestResult("Advanced Encryption", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testAdvancedDecryption() {
+            console.log('Testing advanced decryption...');
+            
+            if (typeof decryptAdvanced !== 'function') {
+                addTestResult("Advanced Decryption Test", "FAIL", "decryptAdvanced function not available");
+                return;
+            }
+            
+            try {
+                const testText = "Advanced decryption test";
+                const testKey = "AdvancedDecryptKey";
+                const testIV = "TestIV12345678901";
+                const keySize = "256";
+                const mode = "CBC";
+                const padding = "Pkcs7";
+                const outputFormat = "Base64";
+                
+                // First encrypt using the tool
+                const encrypted = encryptAdvanced(testText, testKey, testIV, keySize, mode, padding, outputFormat);
+                
+                // Now decrypt using the tool
+                const result = decryptAdvanced(encrypted, testKey, testIV, keySize, mode, padding, outputFormat);
+                
+                if (result === testText) {
+                    addTestResult(
+                        "Advanced Decryption",
+                        "PASS",
+                        `Original: "${testText}"<br>Decrypted: "${result}"`
+                    );
+                } else {
+                    addTestResult(
+                        "Advanced Decryption",
+                        "FAIL",
+                        `Advanced decryption failed. Expected: "${testText}", Got: "${result}"`
+                    );
+                }
+                
+            } catch (error) {
+                addTestResult("Advanced Decryption", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testUtilityFunctions() {
+            console.log('Testing utility functions...');
+            
+            if (typeof generateRandomIV !== 'function') {
+                addTestResult("IV Generation Test", "FAIL", "generateRandomIV function not available");
+                return;
+            }
+            
+            try {
+                const iv = generateRandomIV();
+                
+                if (iv && iv.length === 16) {
+                    addTestResult("IV Generation", "PASS", `Generated IV: ${iv}`);
+                } else {
+                    addTestResult("IV Generation", "FAIL", `Invalid IV length: ${iv ? iv.length : 'undefined'}`);
+                }
+                
+            } catch (error) {
+                addTestResult("IV Generation", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testErrorHandling() {
+            console.log('Testing error handling...');
+            
+            if (typeof encryptBasic !== 'function') {
+                addTestResult("Error Handling Test", "FAIL", "encryptBasic function not available");
+                return;
+            }
+            
+            try {
+                // Test empty key
+                try {
+                    const result = encryptBasic("test", "");
+                    addTestResult("Empty Key Handling", "FAIL", "Should have failed with empty key");
+                } catch (error) {
+                    addTestResult("Empty Key Handling", "PASS", `Correctly caught error: ${error.message}`);
+                }
+                
+                // Test empty text
+                try {
+                    const result = encryptBasic("", "test_key");
+                    if (result && result.length > 0) {
+                        addTestResult("Empty Text Handling", "PASS", "Empty text handled correctly");
+                    } else {
+                        addTestResult("Empty Text Handling", "FAIL", "Empty text should be handled");
+                    }
+                } catch (error) {
+                    addTestResult("Empty Text Handling", "PASS", `Correctly caught error: ${error.message}`);
+                }
+                
+            } catch (error) {
+                addTestResult("Error Handling", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function displaySummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const passRate = ((passedTests / totalTests) * 100).toFixed(1);
+            
+            summaryDiv.innerHTML = `
+                <div class="test-summary">
+                    <h2>Test Summary</h2>
+                    <p><strong>Total Tests:</strong> ${totalTests}</p>
+                    <p><strong>Passed:</strong> <span class="pass">${passedTests}</span></p>
+                    <p><strong>Failed:</strong> <span class="fail">${failedTests}</span></p>
+                    <p><strong>Pass Rate:</strong> <span class="${passRate >= 90 ? 'pass' : passRate >= 70 ? 'warning' : 'fail'}">${passRate}%</span></p>
+                </div>
+            `;
+            
+            console.log(`Tests completed. ${passedTests}/${totalTests} passed (${passRate}%)`);
+        }
+
+        // Auto-run tests when page loads
+        window.onload = function() {
+            console.log('AES Tool Integration Test Suite loaded');
+        };
+    </script>
+    
+    <!-- Include the actual AES tool JavaScript -->
+    <script src="js/aes.js"></script>
+</body>
+</html> 

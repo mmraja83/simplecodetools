@@ -29,6 +29,36 @@
     </header>
 
     <main class="tool-container">
+        <!-- Tool Navigation Bar -->
+        <nav class="tool-nav" aria-label="Tool Navigation">
+            <div class="container">
+                <a href="../index.html" class="tool-nav-home" aria-label="Go to Home Page">
+                    <span class="tool-nav-home-icon" aria-hidden="true">🏠</span>
+                    <span>Home</span>
+                </a>
+                <ul class="tool-nav-list" role="tablist">
+                    <li class="tool-nav-item" role="presentation">
+                        <a href="aes.html" class="tool-nav-link active" role="tab" aria-selected="true" aria-label="AES Cipher Tool (Current)">
+                            <span class="tool-nav-icon" aria-hidden="true">🔐</span>
+                            <span class="tool-nav-text">AES Cipher</span>
+                        </a>
+                    </li>
+                    <li class="tool-nav-item" role="presentation">
+                        <a href="base64.html" class="tool-nav-link" role="tab" aria-selected="false" aria-label="Base64 Cipher Tool">
+                            <span class="tool-nav-icon" aria-hidden="true">📝</span>
+                            <span class="tool-nav-text">Base64 Cipher</span>
+                        </a>
+                    </li>
+                    <li class="tool-nav-item" role="presentation">
+                        <a href="md5.html" class="tool-nav-link" role="tab" aria-selected="false" aria-label="MD5 Cipher Tool">
+                            <span class="tool-nav-icon" aria-hidden="true">🔒</span>
+                            <span class="tool-nav-text">MD5 Cipher</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
         <div class="tool-header">
             <h1>🔐 AES Cipher</h1>
             <p>Advanced Encryption Standard encryption and decryption tool</p>

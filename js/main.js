@@ -228,3 +228,97 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Simple Code Tools - Landing page loaded successfully!');
 }); 
+
+// Tool Navigation Enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth transitions to tool navigation
+    const toolNavLinks = document.querySelectorAll('.tool-nav-link');
+    
+    toolNavLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Add a subtle loading state
+            this.style.opacity = '0.7';
+            this.style.transform = 'scale(0.98)';
+            
+            // Reset after a short delay
+            setTimeout(() => {
+                this.style.opacity = '';
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Add keyboard navigation support
+    document.addEventListener('keydown', function(e) {
+        if (e.altKey) {
+            switch(e.key) {
+                case '1':
+                    e.preventDefault();
+                    const aesLink = document.querySelector('a[href*="aes.html"]');
+                    if (aesLink) aesLink.click();
+                    break;
+                case '2':
+                    e.preventDefault();
+                    const base64Link = document.querySelector('a[href*="base64.html"]');
+                    if (base64Link) base64Link.click();
+                    break;
+                case '3':
+                    e.preventDefault();
+                    const md5Link = document.querySelector('a[href*="md5.html"]');
+                    if (md5Link) md5Link.click();
+                    break;
+                case 'h':
+                    e.preventDefault();
+                    const homeLink = document.querySelector('.tool-nav-home');
+                    if (homeLink) homeLink.click();
+                    break;
+            }
+        }
+    });
+
+    // Add tooltip for keyboard shortcuts
+    const toolNavItems = document.querySelectorAll('.tool-nav-item');
+    toolNavItems.forEach((item, index) => {
+        const link = item.querySelector('.tool-nav-link');
+        const shortcut = index + 1;
+        link.title = `Alt + ${shortcut} - Quick access`;
+    });
+
+    // Add home button tooltip
+    const homeButton = document.querySelector('.tool-nav-home');
+    if (homeButton) {
+        homeButton.title = 'Alt + H - Go to Home';
+    }
+
+    // Add page context indicator
+    const currentPage = window.location.pathname;
+    if (currentPage.includes('aes.html')) {
+        document.title = '🔐 AES Cipher - Simple Code Tools';
+    } else if (currentPage.includes('base64.html')) {
+        document.title = '📝 Base64 Cipher - Simple Code Tools';
+    } else if (currentPage.includes('md5.html')) {
+        document.title = '🔒 MD5 Cipher - Simple Code Tools';
+    }
+
+    // Add smooth scrolling for navigation
+    const toolNav = document.querySelector('.tool-nav');
+    if (toolNav) {
+        toolNav.style.scrollBehavior = 'smooth';
+    }
+
+    // Add visual feedback for navigation state
+    const activeLink = document.querySelector('.tool-nav-link.active');
+    if (activeLink) {
+        activeLink.style.animation = 'pulse 2s infinite';
+    }
+}); 
+
+// Add CSS animation for active link
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+`;
+document.head.appendChild(style); 

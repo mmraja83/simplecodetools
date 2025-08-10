@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>AES Encryption/Decryption Test</h1>
+    <div id="testResults"></div>
+    
+    <script>
+        function testAES() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+            
+            // Test 1: Basic AES encryption/decryption
+            testBasicAES();
+            
+            // Test 2: Advanced AES with different modes
+            testAdvancedAES();
+            
+            // Test 3: Key size variations
+            testKeySizes();
+            
+            // Test 4: Output format variations
+            testOutputFormats();
+            
+            // Test 5: Error handling
+            testErrorHandling();
+        }
+        
+        function testBasicAES() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<div class="test-section"><h3>Test 1: Basic AES Encryption/Decryption</h3>';
+            
+            try {
+                const testText = "Hello World";
+                const testKey = "MySecretKey123";
+                
+                // Encrypt
+                const encrypted = CryptoJS.AES.encrypt(testText, testKey);
+                const encryptedStr = encrypted.toString();
+                
+                // Decrypt
+                const decrypted = CryptoJS.AES.decrypt(encryptedStr, testKey);
+                const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                const test1Result = decryptedStr === testText ? 'PASS' : 'FAIL';
+                const resultClass = test1Result === 'PASS' ? 'pass' : 'fail';
+                
+                results.innerHTML += `
+                    <p><strong>Basic Test:</strong> <span class="${resultClass}">${test1Result}</span></p>
+                    <p><strong>Original:</strong> "${testText}"</p>
+                    <p><strong>Key:</strong> "${testKey}"</p>
+                    <p><strong>Encrypted:</strong> <pre>${encryptedStr}</pre></p>
+                    <p><strong>Decrypted:</strong> "${decryptedStr}"</p>
+                `;
+                
+            } catch (error) {
+                results.innerHTML += `<p class="fail">Basic AES test failed: ${error.message}</p>`;
+            }
+            
+            results.innerHTML += '</div>';
+        }
+        
+        function testAdvancedAES() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<div class="test-section"><h3>Test 2: Advanced AES with Different Modes</h3>';
+            
+            const modes = ['CBC', 'CFB', 'CTR', 'ECB', 'OFB'];
+            const testText = "Advanced AES Test";
+            const testKey = "AdvancedKey123456";
+            const testIV = "TestIV12345678901";
+            
+            modes.forEach(mode => {
+                try {
+                    const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(32, '0').substring(0, 32));
+                    const ivObj = CryptoJS.enc.Utf8.parse(testIV.padEnd(16, '0').substring(0, 16));
+                    
+                    const options = {
+                        iv: ivObj,
+                        mode: CryptoJS.mode[mode],
+                        padding: CryptoJS.pad.Pkcs7
+                    };
+                    
+                    // Encrypt
+                    const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                    const encryptedStr = encrypted.toString();
+                    
+                    // Decrypt
+                    const decrypted = CryptoJS.AES.decrypt(encryptedStr, keyObj, options);
+                    const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+                    
+                    const testResult = decryptedStr === testText ? 'PASS' : 'FAIL';
+                    const resultClass = testResult === 'PASS' ? 'pass' : 'fail';
+                    
+                    results.innerHTML += `
+                        <p><strong>${mode} Mode:</strong> <span class="${resultClass}">${testResult}</span></p>
+                        <p><strong>Encrypted:</strong> <pre>${encryptedStr.substring(0, 100)}...</pre></p>
+                        <p><strong>Decrypted:</strong> "${decryptedStr}"</p>
+                    `;
+                    
+                } catch (error) {
+                    results.innerHTML += `<p class="fail">${mode} mode test failed: ${error.message}</p>`;
+                }
+            });
+            
+            results.innerHTML += '</div>';
+        }
+        
+        function testKeySizes() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<div class="test-section"><h3>Test 3: Key Size Variations</h3>';
+            
+            const keySizes = [128, 192, 256];
+            const testText = "Key Size Test";
+            const testKey = "KeySizeTest123";
+            const testIV = "TestIV12345678901";
+            
+            keySizes.forEach(keySize => {
+                try {
+                    const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(keySize / 8, '0').substring(0, keySize / 8));
+                    const ivObj = CryptoJS.enc.Utf8.parse(testIV.padEnd(16, '0').substring(0, 16));
+                    
+                    const options = {
+                        iv: ivObj,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    };
+                    
+                    // Encrypt
+                    const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                    const encryptedStr = encrypted.toString();
+                    
+                    // Decrypt
+                    const decrypted = CryptoJS.AES.decrypt(encryptedStr, keyObj, options);
+                    const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+                    
+                    const testResult = decryptedStr === testText ? 'PASS' : 'FAIL';
+                    const resultClass = testResult === 'PASS' ? 'pass' : 'fail';
+                    
+                    results.innerHTML += `
+                        <p><strong>${keySize}-bit Key:</strong> <span class="${resultClass}">${testResult}</span></p>
+                        <p><strong>Key Length:</strong> ${keySize / 8} bytes</p>
+                        <p><strong>Decrypted:</strong> "${decryptedStr}"</p>
+                    `;
+                    
+                } catch (error) {
+                    results.innerHTML += `<p class="fail">${keySize}-bit key test failed: ${error.message}</p>`;
+                }
+            });
+            
+            results.innerHTML += '</div>';
+        }
+        
+        function testOutputFormats() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<div class="test-section"><h3>Test 4: Output Format Variations</h3>';
+            
+            const formats = ['Base64', 'Hex', 'Utf8'];
+            const testText = "Format Test";
+            const testKey = "FormatKey123456";
+            const testIV = "TestIV12345678901";
+            
+            formats.forEach(format => {
+                try {
+                    const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(32, '0').substring(0, 32));
+                    const ivObj = CryptoJS.enc.Utf8.parse(testIV.padEnd(16, '0').substring(0, 16));
+                    
+                    const options = {
+                        iv: ivObj,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    };
+                    
+                    // Encrypt
+                    const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                    
+                    // Format output
+                    let formattedOutput;
+                    switch (format) {
+                        case 'Base64':
+                            formattedOutput = encrypted.toString();
+                            break;
+                        case 'Hex':
+                            formattedOutput = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+                            break;
+                        case 'Utf8':
+                            formattedOutput = encrypted.ciphertext.toString(CryptoJS.enc.Utf8);
+                            break;
+                    }
+                    
+                    results.innerHTML += `
+                        <p><strong>${format} Format:</strong> <span class="pass">PASS</span></p>
+                        <p><strong>Output:</strong> <pre>${formattedOutput.substring(0, 100)}...</pre></p>
+                    `;
+                    
+                } catch (error) {
+                    results.innerHTML += `<p class="fail">${format} format test failed: ${error.message}</p>`;
+                }
+            });
+            
+            results.innerHTML += '</div>';
+        }
+        
+        function testErrorHandling() {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<div class="test-section"><h3>Test 5: Error Handling</h3>';
+            
+            // Test 1: Empty key
+            try {
+                CryptoJS.AES.encrypt("test", "");
+                results.innerHTML += '<p class="fail">Empty key test: Should have failed but didn\'t</p>';
+            } catch (error) {
+                results.innerHTML += `<p class="pass">Empty key test: Correctly caught error - ${error.message}</p>`;
+            }
+            
+            // Test 2: Invalid decryption
+            try {
+                const decrypted = CryptoJS.AES.decrypt("invalid_encrypted_text", "test_key");
+                const result = decrypted.toString(CryptoJS.enc.Utf8);
+                if (!result) {
+                    results.innerHTML += '<p class="pass">Invalid decryption test: Correctly returned empty result</p>';
+                } else {
+                    results.innerHTML += '<p class="fail">Invalid decryption test: Should have returned empty result</p>';
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="pass">Invalid decryption test: Correctly caught error - ${error.message}</p>`;
+            }
+            
+            // Test 3: Special characters in text
+            try {
+                const specialText = "Special chars: @#$%^&*()_+-=[]{}|;':\",./<>?";
+                const encrypted = CryptoJS.AES.encrypt(specialText, "test_key");
+                const decrypted = CryptoJS.AES.decrypt(encrypted.toString(), "test_key");
+                const result = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                const testResult = result === specialText ? 'PASS' : 'FAIL';
+                const resultClass = testResult === 'PASS' ? 'pass' : 'fail';
+                
+                results.innerHTML += `<p><strong>Special characters test:</strong> <span class="${resultClass}">${testResult}</span></p>`;
+                
+            } catch (error) {
+                results.innerHTML += `<p class="fail">Special characters test failed: ${error.message}</p>`;
+            }
+            
+            results.innerHTML += '</div>';
+        }
+        
+        // Run tests when page loads
+        window.onload = testAES;
+    </script>
+</body>
+</html> 

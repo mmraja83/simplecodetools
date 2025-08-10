@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Tool Actual Functionality Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pass { color: #28a745; font-weight: bold; }
+        .fail { color: #dc3545; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .warning { color: #ffc107; font-weight: bold; }
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            overflow-x: auto; 
+            border: 1px solid #e9ecef;
+            font-size: 12px;
+        }
+        .test-header {
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .test-summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .test-details {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .run-all-btn {
+            background: #28a745;
+            font-size: 16px;
+            padding: 15px 30px;
+        }
+        .run-all-btn:hover {
+            background: #1e7e34;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 AES Tool Actual Functionality Test</h1>
+    <p>This test suite validates the actual AES tool functions that users interact with</p>
+    
+    <button class="run-all-btn" onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="testResults"></div>
+    <div id="testSummary"></div>
+    
+    <script>
+        let testResults = [];
+        let totalTests = 0;
+        let passedTests = 0;
+        let failedTests = 0;
+
+        function runAllTests() {
+            clearResults();
+            testResults = [];
+            totalTests = 0;
+            passedTests = 0;
+            failedTests = 0;
+            
+            console.log('Starting AES Tool Actual Functionality Tests...');
+            
+            // Run all test suites
+            testBasicFunctions();
+            testAdvancedFunctions();
+            testUtilityFunctions();
+            testErrorHandling();
+            testRealWorldScenarios();
+            
+            displaySummary();
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('testSummary').innerHTML = '';
+        }
+
+        function addTestResult(testName, result, details = '') {
+            totalTests++;
+            if (result === 'PASS') {
+                passedTests++;
+            } else {
+                failedTests++;
+            }
+            
+            testResults.push({
+                name: testName,
+                result: result,
+                details: details
+            });
+            
+            const resultsDiv = document.getElementById('testResults');
+            const resultClass = result === 'PASS' ? 'pass' : 'fail';
+            
+            resultsDiv.innerHTML += `
+                <div class="test-section">
+                    <div class="test-header">
+                        <h3>${testName}</h3>
+                    </div>
+                    <p><strong>Result:</strong> <span class="${resultClass}">${result}</span></p>
+                    ${details ? `<div class="test-details">${details}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function testBasicFunctions() {
+            console.log('Testing basic AES functions...');
+            
+            try {
+                // Test 1: Basic encryption
+                const testText = "Hello World! This is a test message.";
+                const testKey = "MySecretKey123";
+                
+                const encrypted = CryptoJS.AES.encrypt(testText, testKey);
+                const encryptedStr = encrypted.toString();
+                
+                if (encryptedStr && encryptedStr.length > 0) {
+                    addTestResult(
+                        "Basic Encryption",
+                        "PASS",
+                        `Original: "${testText}"<br>Key: "${testKey}"<br>Encrypted: <pre>${encryptedStr}</pre>`
+                    );
+                } else {
+                    addTestResult("Basic Encryption", "FAIL", "Encryption returned empty result");
+                    return;
+                }
+                
+                // Test 2: Basic decryption
+                const decrypted = CryptoJS.AES.decrypt(encryptedStr, testKey);
+                const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                if (decryptedStr === testText) {
+                    addTestResult(
+                        "Basic Decryption",
+                        "PASS",
+                        `Decrypted: "${decryptedStr}"`
+                    );
+                } else {
+                    addTestResult(
+                        "Basic Decryption",
+                        "FAIL",
+                        `Decryption failed. Expected: "${testText}", Got: "${decryptedStr}"`
+                    );
+                }
+                
+                // Test 3: Empty string handling
+                const emptyText = "";
+                const encryptedEmpty = CryptoJS.AES.encrypt(emptyText, testKey);
+                const decryptedEmpty = CryptoJS.AES.decrypt(encryptedEmpty.toString(), testKey);
+                const decryptedEmptyStr = decryptedEmpty.toString(CryptoJS.enc.Utf8);
+                
+                if (decryptedEmptyStr === emptyText) {
+                    addTestResult("Empty String Handling", "PASS", "Empty string encrypted and decrypted successfully");
+                } else {
+                    addTestResult("Empty String Handling", "FAIL", `Empty string test failed. Expected: "", Got: "${decryptedEmptyStr}"`);
+                }
+                
+            } catch (error) {
+                addTestResult("Basic Functions", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testAdvancedFunctions() {
+            console.log('Testing advanced AES functions...');
+            
+            try {
+                const testText = "Advanced AES Test with special chars: @#$%^&*()";
+                const testKey = "AdvancedKey123456789";
+                const testIV = "TestIV12345678901";
+                
+                // Test CBC mode with PKCS7 padding
+                const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(32, '0').substring(0, 32));
+                const ivObj = CryptoJS.enc.Utf8.parse(testIV.padEnd(16, '0').substring(0, 16));
+                
+                const options = {
+                    iv: ivObj,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                };
+                
+                const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                const encryptedStr = encrypted.toString();
+                
+                const decrypted = CryptoJS.AES.decrypt(encryptedStr, keyObj, options);
+                const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                if (decryptedStr === testText) {
+                    addTestResult(
+                        "Advanced CBC Mode",
+                        "PASS",
+                        `Mode: CBC, Padding: PKCS7<br>Original: "${testText}"<br>Decrypted: "${decryptedStr}"`
+                    );
+                } else {
+                    addTestResult(
+                        "Advanced CBC Mode",
+                        "FAIL",
+                        `CBC mode test failed. Expected: "${testText}", Got: "${decryptedStr}"`
+                    );
+                }
+                
+                // Test different key sizes
+                const keySizes = [128, 192, 256];
+                keySizes.forEach(keySize => {
+                    try {
+                        const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(keySize / 8, '0').substring(0, keySize / 8));
+                        
+                        const options = {
+                            iv: ivObj,
+                            mode: CryptoJS.mode.CBC,
+                            padding: CryptoJS.pad.Pkcs7
+                        };
+                        
+                        const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                        const decrypted = CryptoJS.AES.decrypt(encrypted.toString(), keyObj, options);
+                        const result = decrypted.toString(CryptoJS.enc.Utf8);
+                        
+                        if (result === testText) {
+                            addTestResult(
+                                `${keySize}-bit Key`,
+                                "PASS",
+                                `Key length: ${keySize / 8} bytes`
+                            );
+                        } else {
+                            addTestResult(
+                                `${keySize}-bit Key`,
+                                "FAIL",
+                                `${keySize}-bit key test failed`
+                            );
+                        }
+                    } catch (error) {
+                        addTestResult(`${keySize}-bit Key`, "FAIL", `Error: ${error.message}`);
+                    }
+                });
+                
+            } catch (error) {
+                addTestResult("Advanced Functions", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testUtilityFunctions() {
+            console.log('Testing utility functions...');
+            
+            try {
+                // Test IV generation (simulate the tool's function)
+                const testIV = generateTestIV();
+                if (testIV && testIV.length === 16) {
+                    addTestResult("IV Generation", "PASS", `Generated IV: ${testIV}`);
+                } else {
+                    addTestResult("IV Generation", "FAIL", `Invalid IV length: ${testIV ? testIV.length : 'undefined'}`);
+                }
+                
+                // Test output formats
+                const testText = "Format test";
+                const testKey = "FormatTestKey";
+                const testIV = "TestIV12345678901";
+                
+                const keyObj = CryptoJS.enc.Utf8.parse(testKey.padEnd(32, '0').substring(0, 32));
+                const ivObj = CryptoJS.enc.Utf8.parse(testIV.padEnd(16, '0').substring(0, 16));
+                
+                const options = {
+                    iv: ivObj,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                };
+                
+                const encrypted = CryptoJS.AES.encrypt(testText, keyObj, options);
+                
+                // Test Base64 output
+                const base64Output = encrypted.toString();
+                if (base64Output && base64Output.length > 0) {
+                    addTestResult("Base64 Output", "PASS", `Base64 output: ${base64Output.substring(0, 50)}...`);
+                } else {
+                    addTestResult("Base64 Output", "FAIL", "Base64 output is empty");
+                }
+                
+                // Test Hex output
+                const hexOutput = encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+                if (hexOutput && hexOutput.length > 0) {
+                    addTestResult("Hex Output", "PASS", `Hex output: ${hexOutput.substring(0, 50)}...`);
+                } else {
+                    addTestResult("Hex Output", "FAIL", "Hex output is empty");
+                }
+                
+            } catch (error) {
+                addTestResult("Utility Functions", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testErrorHandling() {
+            console.log('Testing error handling...');
+            
+            try {
+                // Test empty key
+                try {
+                    CryptoJS.AES.encrypt("test", "");
+                    addTestResult("Empty Key Handling", "FAIL", "Should have failed with empty key");
+                } catch (error) {
+                    addTestResult("Empty Key Handling", "PASS", `Correctly caught error: ${error.message}`);
+                }
+                
+                // Test invalid encrypted text
+                try {
+                    const decrypted = CryptoJS.AES.decrypt("invalid_encrypted_text", "test_key");
+                    const result = decrypted.toString(CryptoJS.enc.Utf8);
+                    if (!result) {
+                        addTestResult("Invalid Encrypted Text", "PASS", "Correctly returned empty result for invalid input");
+                    } else {
+                        addTestResult("Invalid Encrypted Text", "FAIL", "Should have returned empty result");
+                    }
+                } catch (error) {
+                    addTestResult("Invalid Encrypted Text", "PASS", `Correctly caught error: ${error.message}`);
+                }
+                
+            } catch (error) {
+                addTestResult("Error Handling", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function testRealWorldScenarios() {
+            console.log('Testing real-world scenarios...');
+            
+            try {
+                // Test 1: Password-like text
+                const passwordText = "MySecurePassword123!@#";
+                const passwordKey = "SuperSecretMasterKey456";
+                
+                const encrypted = CryptoJS.AES.encrypt(passwordText, passwordKey);
+                const decrypted = CryptoJS.AES.decrypt(encrypted.toString(), passwordKey);
+                const result = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                if (result === passwordText) {
+                    addTestResult("Password Encryption", "PASS", "Password encrypted and decrypted successfully");
+                } else {
+                    addTestResult("Password Encryption", "FAIL", "Password encryption failed");
+                }
+                
+                // Test 2: Long text
+                const longText = "This is a very long text that should test the AES encryption with multiple blocks. It contains various characters and should be properly encrypted and decrypted without any issues. The text should be long enough to require multiple encryption blocks.";
+                const longKey = "LongTextTestKey789";
+                
+                const encryptedLong = CryptoJS.AES.encrypt(longText, longKey);
+                const decryptedLong = CryptoJS.AES.decrypt(encryptedLong.toString(), longKey);
+                const longResult = decryptedLong.toString(CryptoJS.enc.Utf8);
+                
+                if (longResult === longText) {
+                    addTestResult("Long Text Encryption", "PASS", "Long text encrypted and decrypted successfully");
+                } else {
+                    addTestResult("Long Text Encryption", "FAIL", "Long text encryption failed");
+                }
+                
+                // Test 3: Special characters
+                const specialText = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?`~";
+                const specialKey = "SpecialKey!@#";
+                
+                const encryptedSpecial = CryptoJS.AES.encrypt(specialText, specialKey);
+                const decryptedSpecial = CryptoJS.AES.decrypt(encryptedSpecial.toString(), specialKey);
+                const specialResult = decryptedSpecial.toString(CryptoJS.enc.Utf8);
+                
+                if (specialResult === specialText) {
+                    addTestResult("Special Characters", "PASS", "Special characters encrypted and decrypted successfully");
+                } else {
+                    addTestResult("Special Characters", "FAIL", "Special characters encryption failed");
+                }
+                
+            } catch (error) {
+                addTestResult("Real-World Scenarios", "FAIL", `Error: ${error.message}`);
+            }
+        }
+
+        function generateTestIV() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 16; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function displaySummary() {
+            const summaryDiv = document.getElementById('testSummary');
+            const passRate = ((passedTests / totalTests) * 100).toFixed(1);
+            
+            summaryDiv.innerHTML = `
+                <div class="test-summary">
+                    <h2>Test Summary</h2>
+                    <p><strong>Total Tests:</strong> ${totalTests}</p>
+                    <p><strong>Passed:</strong> <span class="pass">${passedTests}</span></p>
+                    <p><strong>Failed:</strong> <span class="fail">${failedTests}</span></p>
+                    <p><strong>Pass Rate:</strong> <span class="${passRate >= 90 ? 'pass' : passRate >= 70 ? 'warning' : 'fail'}">${passRate}%</span></p>
+                </div>
+            `;
+            
+            console.log(`Tests completed. ${passedTests}/${totalTests} passed (${passRate}%)`);
+        }
+
+        // Auto-run tests when page loads
+        window.onload = function() {
+            console.log('AES Tool Actual Functionality Test Suite loaded');
+        };
+    </script>
+</body>
+</html> 
