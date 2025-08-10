@@ -64,7 +64,7 @@ function processBasicForm() {
     }
 }
 
-function processAdvancedForm() {
+async function processAdvancedForm() {
     const text = document.getElementById('advancedText').value.trim();
     const file = document.getElementById('fileInput').files[0];
     const hashFormat = document.getElementById('hashFormat').value;
@@ -158,9 +158,15 @@ async function generateFileMD5(file, format, salt, iterations) {
             try {
                 let data = e.target.result;
                 
+                // Convert ArrayBuffer to WordArray for CryptoJS
+                const wordArray = CryptoJS.lib.WordArray.create(data);
+                
                 // Apply salt if provided
                 if (salt) {
-                    data = salt + data;
+                    const saltArray = CryptoJS.enc.Utf8.parse(salt);
+                    data = saltArray.concat(wordArray);
+                } else {
+                    data = wordArray;
                 }
                 
                 // Apply iterations
@@ -195,7 +201,7 @@ async function generateFileMD5(file, format, salt, iterations) {
             reject(new Error('Failed to read file'));
         };
         
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
     });
 }
 
@@ -383,12 +389,50 @@ function showCopySuccess(elementId) {
 }
 
 function showSuccess(message) {
-    // You can implement a toast notification here
-    console.log('Success:', message);
+    showToast(message, 'success');
 }
 
 function showError(message) {
-    // You can implement a toast notification here
-    console.error('Error:', message);
-    alert(message);
+    showToast(message, 'error');
+}
+
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+        </div>
+    `;
+    
+    // Add toast styles
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        max-width: 300px;
+        font-family: inherit;
+    `;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
 } 
