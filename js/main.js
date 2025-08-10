@@ -1,4 +1,4 @@
-// Main JavaScript for Simple Code Tools landing page
+// Main JavaScript for Metavibes.me landing page
 
 document.addEventListener('DOMContentLoaded', function() {
     // Smooth scrolling for navigation links
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    console.log('Simple Code Tools - Landing page loaded successfully!');
+    console.log('Metavibes.me - Landing page loaded successfully!');
 }); 
 
 // Tool Navigation Enhancement
@@ -293,11 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add page context indicator
     const currentPage = window.location.pathname;
     if (currentPage.includes('aes.html')) {
-        document.title = '🔐 AES Cipher - Simple Code Tools';
+        document.title = '🔐 AES Cipher - Metavibes.me';
     } else if (currentPage.includes('base64.html')) {
-        document.title = '📝 Base64 Cipher - Simple Code Tools';
+        document.title = '📝 Base64 Cipher - Metavibes.me';
     } else if (currentPage.includes('md5.html')) {
-        document.title = '🔒 MD5 Cipher - Simple Code Tools';
+        document.title = '🔒 MD5 Cipher - Metavibes.me';
     }
 
     // Add smooth scrolling for navigation
