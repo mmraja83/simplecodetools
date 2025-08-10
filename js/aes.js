@@ -139,11 +139,46 @@ function decryptBasic(encryptedText, key) {
     }
 }
 
+// Helper function to process key and IV consistently
+function processKeyAndIV(key, iv, keySize) {
+    // Process key - ensure it's exactly keySize/8 bytes long
+    let keyBytes = CryptoJS.enc.Utf8.parse(key);
+    const keySizeBytes = keySize / 8;
+    
+    // If key is shorter than required, pad with zeros
+    if (keyBytes.words.length * 4 < keySizeBytes) {
+        const padding = new Array(keySizeBytes - (keyBytes.sigBytes % keySizeBytes)).join('\0');
+        keyBytes = CryptoJS.enc.Utf8.parse(key + padding);
+    }
+    // If key is longer than required, truncate
+    if (keyBytes.sigBytes > keySizeBytes) {
+        keyBytes.sigBytes = keySizeBytes;
+    }
+    
+    // Process IV - ensure it's exactly 16 bytes
+    let ivBytes = CryptoJS.enc.Utf8.parse(iv);
+    const ivSizeBytes = 16;
+    
+    // If IV is shorter than required, pad with zeros
+    if (ivBytes.words.length * 4 < ivSizeBytes) {
+        const padding = new Array(ivSizeBytes - (ivBytes.sigBytes % ivSizeBytes)).join('\0');
+        ivBytes = CryptoJS.enc.Utf8.parse(iv + padding);
+    }
+    // If IV is longer than required, truncate
+    if (ivBytes.sigBytes > ivSizeBytes) {
+        ivBytes.sigBytes = ivSizeBytes;
+    }
+    
+    return {
+        key: keyBytes,
+        iv: ivBytes
+    };
+}
+
 function encryptAdvanced(text, key, iv, keySize, mode, padding, outputFormat) {
     try {
-        // Prepare key and IV
-        const keyObj = CryptoJS.enc.Utf8.parse(key.padEnd(keySize / 8, '0').substring(0, keySize / 8));
-        const ivObj = CryptoJS.enc.Utf8.parse(iv.padEnd(16, '0').substring(0, 16));
+        // Process key and IV consistently
+        const { key: keyObj, iv: ivObj } = processKeyAndIV(key, iv, keySize);
 
         // Configure encryption options
         const options = {
@@ -173,9 +208,8 @@ function encryptAdvanced(text, key, iv, keySize, mode, padding, outputFormat) {
 
 function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputFormat) {
     try {
-        // Prepare key and IV
-        const keyObj = CryptoJS.enc.Utf8.parse(key.padEnd(keySize / 8, '\0').substring(0, keySize / 8));
-        const ivObj = CryptoJS.enc.Utf8.parse(iv.padEnd(16, '\0').substring(0, 16));
+        // Process key and IV consistently using the same helper function as encryption
+        const { key: keyObj, iv: ivObj } = processKeyAndIV(key, iv, keySize);
 
         // Configure decryption options
         const options = {
@@ -186,31 +220,104 @@ function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputF
 
         let decrypted;
         
+        // Handle different input formats
         if (outputFormat === 'Base64') {
             // For Base64 input, use the direct decrypt method
             decrypted = CryptoJS.AES.decrypt(encryptedText, keyObj, options);
-        } else {
-            // For other formats, create a CipherParams object
-            let ciphertext;
-            switch (outputFormat) {
-                case 'Hex':
-                    ciphertext = CryptoJS.enc.Hex.parse(encryptedText);
-                    break;
-                case 'Utf8':
-                default:
-                    ciphertext = CryptoJS.enc.Utf8.parse(encryptedText);
-            }
+        } else if (outputFormat === 'Hex') {
+            // For Hex input, parse and create CipherParams
+            const parsedHex = CryptoJS.enc.Hex.parse(encryptedText);
             const cipherParams = CryptoJS.lib.CipherParams.create({
-                ciphertext: ciphertext
+                ciphertext: parsedHex,
+                key: keyObj,
+                iv: ivObj,
+                algorithm: CryptoJS.algo.AES,
+                mode: options.mode,
+                padding: options.padding
+            });
+            decrypted = CryptoJS.AES.decrypt(cipherParams, keyObj, options);
+        } else {
+            // For UTF-8 input, parse and create CipherParams
+            const parsedUtf8 = CryptoJS.enc.Utf8.parse(encryptedText);
+            const cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: parsedUtf8,
+                key: keyObj,
+                iv: ivObj,
+                algorithm: CryptoJS.algo.AES,
+                mode: options.mode,
+                padding: options.padding
             });
             decrypted = CryptoJS.AES.decrypt(cipherParams, keyObj, options);
         }
 
-        // Convert the decrypted data to a UTF-8 string
-        const result = decrypted.toString(CryptoJS.enc.Utf8);
+        // Try to convert the decrypted data to a UTF-8 string
+        let result;
+        try {
+            result = decrypted.toString(CryptoJS.enc.Utf8);
+            
+            // If result is empty but decrypted data exists, try to handle it differently
+            if (!result && decrypted.sigBytes > 0) {
+                // Try to get the raw words and convert manually
+                const words = decrypted.words;
+                const sigBytes = decrypted.sigBytes;
+                const resultArray = [];
+                
+                for (let i = 0; i < sigBytes; i++) {
+                    const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+                    resultArray.push(String.fromCharCode(byte));
+                }
+                
+                result = resultArray.join('');
+            }
+        } catch (e) {
+            console.error('Error converting decrypted data to string:', e);
+            // If string conversion fails, try to get raw bytes
+            const words = decrypted.words;
+            const sigBytes = decrypted.sigBytes;
+            const resultArray = [];
+            
+            for (let i = 0; i < sigBytes; i++) {
+                const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+                resultArray.push(String.fromCharCode(byte));
+            }
+            
+            result = resultArray.join('');
+        }
 
         if (!result) {
-            throw new Error('Decryption failed. Please check your key, IV, and that the input is properly formatted.');
+            // If we still don't have a result, try one more approach
+            try {
+                const words = decrypted.words;
+                const sigBytes = decrypted.sigBytes;
+                const resultArray = [];
+                
+                for (let i = 0; i < sigBytes; i++) {
+                    const byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+                    if (byte > 0) {  // Only include non-null bytes
+                        resultArray.push(String.fromCharCode(byte));
+                    }
+                }
+                
+                result = resultArray.join('');
+                
+                if (!result) {
+                    throw new Error('Decryption resulted in empty output');
+                }
+            } catch (e) {
+                console.error('Final decryption attempt failed:', e);
+                // Provide detailed error information
+                const error = new Error('Decryption failed. Please verify:');
+                error.details = {
+                    keyLength: key.length,
+                    keySize: keySize,
+                    ivLength: iv.length,
+                    inputLength: encryptedText.length,
+                    outputFormat: outputFormat,
+                    decryptedLength: decrypted ? decrypted.sigBytes : 0,
+                    error: e.message
+                };
+                throw error;
+            }
         }
 
         return result;
