@@ -50,7 +50,7 @@
             <form id="basicForm">
                 <div class="form-group">
                     <label for="basicText">Text:</label>
-                    <textarea id="basicText" class="form-control textarea" placeholder="Enter text to generate MD5 hash..."></textarea>
+                    <textarea id="basicText" class="form-control textarea" placeholder="Enter text to generate MD5 hash..." autocomplete="off" spellcheck="false"></textarea>
                 </div>
 
                 <div class="form-actions">
@@ -71,7 +71,7 @@
             <form id="advancedForm">
                 <div class="form-group">
                     <label for="advancedText">Text or URL:</label>
-                    <textarea id="advancedText" class="form-control textarea" placeholder="Enter text or URL to hash..."></textarea>
+                    <textarea id="advancedText" class="form-control textarea" placeholder="Enter text or URL to hash..." autocomplete="off" spellcheck="false"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -79,7 +79,7 @@
                     <div class="file-upload" onclick="document.getElementById('fileInput').click()">
                         <div class="upload-icon">📁</div>
                         <p>Click to select file or drag and drop</p>
-                        <input type="file" id="fileInput" accept="*/*">
+                        <input type="file" id="fileInput" accept="*/*" autocomplete="off">
                     </div>
                     <div id="fileInfo" style="display: none; margin-top: 1rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: var(--border-radius);">
                         <strong>Selected file:</strong> <span id="fileName"></span> (<span id="fileSize"></span>)

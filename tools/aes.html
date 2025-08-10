@@ -63,7 +63,12 @@
 
                 <div class="form-group">
                     <label for="basicKey">Secret Key:</label>
-                    <input type="password" id="basicKey" class="form-control" placeholder="Enter your secret key">
+                    <div class="password-container">
+                        <input type="password" id="basicKey" class="form-control" placeholder="Enter your secret key" autocomplete="current-password">
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -98,11 +103,16 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="advancedKey">Secret Key:</label>
-                        <input type="password" id="advancedKey" class="form-control" placeholder="Enter your secret key">
+                        <div class="password-container">
+                            <input type="password" id="advancedKey" class="form-control" placeholder="Enter your secret key" autocomplete="current-password">
+                            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="advancedIV">Initialization Vector (IV):</label>
-                        <input type="text" id="advancedIV" class="form-control" placeholder="Leave empty for auto-generation">
+                        <input type="text" id="advancedIV" class="form-control" placeholder="Leave empty for auto-generation" autocomplete="off">
                     </div>
                 </div>
 
@@ -112,9 +122,9 @@
                         <div class="form-group">
                             <label for="keySize">Key Size:</label>
                             <select id="keySize" class="form-control">
-                                <option value="128">128 bits</option>
+                                <option value="128" selected>128 bits</option>
                                 <option value="192">192 bits</option>
-                                <option value="256" selected>256 bits</option>
+                                <option value="256">256 bits</option>
                             </select>
                         </div>
                         <div class="form-group">

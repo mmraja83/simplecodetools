@@ -1,6 +1,26 @@
 // AES Encryption/Decryption Tool JavaScript
 
+// Toggle password visibility
+function togglePasswordVisibility(input, button) {
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+    const eyeIcon = button.querySelector('.eye-icon');
+    if (type === 'password') {
+        eyeIcon.textContent = '👁️';
+        button.setAttribute('aria-label', 'Show password');
+    } else {
+        eyeIcon.textContent = '🔒';
+        button.setAttribute('aria-label', 'Hide password');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize password toggles
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        const input = button.closest('.password-container').querySelector('input');
+        button.addEventListener('click', () => togglePasswordVisibility(input, button));
+    });
+    
     // Tab switching functionality
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
