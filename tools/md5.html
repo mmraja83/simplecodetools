@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free MD5 hashing tool. Generate MD5 hashes from text, files, or URLs with advanced options and verification.">
+    <meta name="keywords" content="MD5 hash, MD5 generator, MD5 calculator, hash function, online tool">
+    <title>MD5 Cipher - Simple Code Tools</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html" style="text-decoration: none; color: inherit;">Simple Code Tools</a></h1>
+                    <p>Developer Utilities Made Simple</p>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="../index.html#tools">Tools</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1>🔒 MD5 Cipher</h1>
+            <p>MD5 hashing tool with file support and advanced options</p>
+        </div>
+
+        <div class="tool-tabs">
+            <button class="tab-button active" data-tab="basic">Basic</button>
+            <button class="tab-button" data-tab="advanced">Advanced</button>
+        </div>
+
+        <!-- Basic Tab -->
+        <div id="basic" class="tab-content active">
+            <form id="basicForm">
+                <div class="form-group">
+                    <label for="basicText">Text:</label>
+                    <textarea id="basicText" class="form-control textarea" placeholder="Enter text to generate MD5 hash..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Generate Hash</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearBasicForm()">Clear</button>
+                </div>
+
+                <div id="basicResult" style="display: none;">
+                    <label class="result-label">MD5 Hash:</label>
+                    <div class="result-box" id="basicResultText"></div>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('basicResultText')">Copy</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div id="advanced" class="tab-content">
+            <form id="advancedForm">
+                <div class="form-group">
+                    <label for="advancedText">Text or URL:</label>
+                    <textarea id="advancedText" class="form-control textarea" placeholder="Enter text or URL to hash..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileInput">Or Upload File:</label>
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <p>Click to select file or drag and drop</p>
+                        <input type="file" id="fileInput" accept="*/*">
+                    </div>
+                    <div id="fileInfo" style="display: none; margin-top: 1rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: var(--border-radius);">
+                        <strong>Selected file:</strong> <span id="fileName"></span> (<span id="fileSize"></span>)
+                    </div>
+                </div>
+
+                <div class="advanced-options">
+                    <h4>Advanced Options</h4>
+                    <div class="option-group">
+                        <div class="form-group">
+                            <label for="hashFormat">Hash Format:</label>
+                            <select id="hashFormat" class="form-control">
+                                <option value="hex" selected>Hexadecimal</option>
+                                <option value="base64">Base64</option>
+                                <option value="binary">Binary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="encoding">Text Encoding:</label>
+                            <select id="encoding" class="form-control">
+                                <option value="UTF-8" selected>UTF-8</option>
+                                <option value="ASCII">ASCII</option>
+                                <option value="ISO-8859-1">ISO-8859-1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="salt">Salt (Optional):</label>
+                            <input type="text" id="salt" class="form-control" placeholder="Add salt to hash">
+                        </div>
+                        <div class="form-group">
+                            <label for="iterations">Iterations:</label>
+                            <select id="iterations" class="form-control">
+                                <option value="1" selected>1 (Standard)</option>
+                                <option value="1000">1000</option>
+                                <option value="10000">10,000</option>
+                                <option value="100000">100,000</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Generate Hash</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearAdvancedForm()">Clear</button>
+                </div>
+
+                <div id="advancedResult" style="display: none;">
+                    <label class="result-label">MD5 Hash:</label>
+                    <div class="result-box" id="advancedResultText"></div>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('advancedResultText')">Copy</button>
+                    
+                    <div class="mt-3">
+                        <label class="result-label">Hash Information:</label>
+                        <div class="result-box" id="advancedInfo"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Hash Verification Section -->
+        <div class="mt-4">
+            <div class="advanced-options">
+                <h4>Hash Verification</h4>
+                <div class="form-group">
+                    <label for="verifyHash">Verify Hash:</label>
+                    <input type="text" id="verifyHash" class="form-control" placeholder="Enter hash to verify against your input">
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" onclick="verifyHash()">Verify Hash</button>
+                </div>
+                <div id="verificationResult" style="display: none; margin-top: 1rem;">
+                    <div class="result-box" id="verificationText"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Section -->
+        <div class="mt-4">
+            <div class="advanced-options">
+                <h4>About MD5 Hashing</h4>
+                <p><strong>MD5 (Message Digest Algorithm 5)</strong> is a widely used cryptographic hash function that produces a 128-bit (16-byte) hash value, typically expressed as a 32-character hexadecimal number.</p>
+                
+                <h5>Key Features:</h5>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li><strong>Hash Length:</strong> 128 bits (32 hexadecimal characters)</li>
+                    <li><strong>Speed:</strong> Fast computation suitable for large files</li>
+                    <li><strong>Collision Resistance:</strong> Extremely low probability of hash collisions</li>
+                    <li><strong>File Integrity:</strong> Perfect for verifying file integrity and detecting changes</li>
+                </ul>
+
+                <h5>Common Use Cases:</h5>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li>File integrity verification and checksums</li>
+                    <li>Password hashing (with salt for security)</li>
+                    <li>Digital signatures and certificates</li>
+                    <li>Data deduplication and comparison</li>
+                </ul>
+
+                <h5>Security Note:</h5>
+                <p style="color: var(--warning-color); font-weight: 500;">While MD5 is still useful for file integrity and non-security critical applications, it's no longer considered cryptographically secure for password storage or digital signatures due to collision vulnerabilities.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Simple Code Tools</h3>
+                    <p>Free developer utilities for the modern web.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="aes.html">AES Cipher</a></li>
+                        <li><a href="base64.html">Base64 Cipher</a></li>
+                        <li><a href="md5.html">MD5 Cipher</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                        <li><a href="https://github.com/simplecodetools">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Simple Code Tools. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/md5.js"></script>
+</body>
+</html> 

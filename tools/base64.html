@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Base64 encoding and decoding tool. Encode and decode Base64 strings with support for various input formats and encoding options.">
+    <meta name="keywords" content="Base64 encoder, Base64 decoder, Base64 converter, encoding, decoding, online tool">
+    <title>Base64 Cipher - Simple Code Tools</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html" style="text-decoration: none; color: inherit;">Simple Code Tools</a></h1>
+                    <p>Developer Utilities Made Simple</p>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="../index.html#tools">Tools</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="tool-container">
+        <div class="tool-header">
+            <h1>📝 Base64 Cipher</h1>
+            <p>Base64 encoding and decoding tool with advanced options</p>
+        </div>
+
+        <div class="tool-tabs">
+            <button class="tab-button active" data-tab="basic">Basic</button>
+            <button class="tab-button" data-tab="advanced">Advanced</button>
+        </div>
+
+        <!-- Basic Tab -->
+        <div id="basic" class="tab-content active">
+            <form id="basicForm">
+                <div class="form-group">
+                    <label for="basicOperation">Operation:</label>
+                    <select id="basicOperation" class="form-control">
+                        <option value="encode">Encode</option>
+                        <option value="decode">Decode</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="basicText">Text:</label>
+                    <textarea id="basicText" class="form-control textarea" placeholder="Enter text to encode or decode..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Process</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearBasicForm()">Clear</button>
+                </div>
+
+                <div id="basicResult" style="display: none;">
+                    <label class="result-label">Result:</label>
+                    <div class="result-box" id="basicResultText"></div>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('basicResultText')">Copy</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Advanced Tab -->
+        <div id="advanced" class="tab-content">
+            <form id="advancedForm">
+                <div class="form-group">
+                    <label for="advancedOperation">Operation:</label>
+                    <select id="advancedOperation" class="form-control">
+                        <option value="encode">Encode</option>
+                        <option value="decode">Decode</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="advancedText">Text:</label>
+                    <textarea id="advancedText" class="form-control textarea" placeholder="Enter text to encode or decode..."></textarea>
+                </div>
+
+                <div class="advanced-options">
+                    <h4>Advanced Options</h4>
+                    <div class="option-group">
+                        <div class="form-group">
+                            <label for="encodingType">Encoding Type:</label>
+                            <select id="encodingType" class="form-control">
+                                <option value="standard" selected>Standard Base64</option>
+                                <option value="urlsafe">URL Safe Base64</option>
+                                <option value="mime">MIME Base64</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lineBreaks">Line Breaks:</label>
+                            <select id="lineBreaks" class="form-control">
+                                <option value="none" selected>None</option>
+                                <option value="76">Every 76 characters</option>
+                                <option value="64">Every 64 characters</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFormat">Input Format:</label>
+                            <select id="inputFormat" class="form-control">
+                                <option value="text" selected>Text</option>
+                                <option value="hex">Hexadecimal</option>
+                                <option value="binary">Binary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="outputFormat">Output Format:</label>
+                            <select id="outputFormat" class="form-control">
+                                <option value="base64" selected>Base64</option>
+                                <option value="hex">Hexadecimal</option>
+                                <option value="binary">Binary</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Process</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearAdvancedForm()">Clear</button>
+                </div>
+
+                <div id="advancedResult" style="display: none;">
+                    <label class="result-label">Result:</label>
+                    <div class="result-box" id="advancedResultText"></div>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('advancedResultText')">Copy</button>
+                    
+                    <div class="mt-3">
+                        <label class="result-label">Additional Information:</label>
+                        <div class="result-box" id="advancedInfo"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Information Section -->
+        <div class="mt-4">
+            <div class="advanced-options">
+                <h4>About Base64 Encoding</h4>
+                <p><strong>Base64</strong> is a group of binary-to-text encoding schemes that represent binary data in an ASCII string format by translating it into a radix-64 representation.</p>
+                
+                <h5>Key Features:</h5>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li><strong>Standard Base64:</strong> Uses A-Z, a-z, 0-9, +, and / characters</li>
+                    <li><strong>URL Safe:</strong> Replaces + with - and / with _ for URL compatibility</li>
+                    <li><strong>MIME:</strong> Adds line breaks every 76 characters for email compatibility</li>
+                    <li><strong>Efficiency:</strong> Increases data size by approximately 33%</li>
+                </ul>
+
+                <h5>Common Use Cases:</h5>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li>Encoding binary data in JSON or XML</li>
+                    <li>Email attachments and MIME messages</li>
+                    <li>Data URLs in web applications</li>
+                    <li>Storing binary data in text-based databases</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Simple Code Tools</h3>
+                    <p>Free developer utilities for the modern web.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="aes.html">AES Cipher</a></li>
+                        <li><a href="base64.html">Base64 Cipher</a></li>
+                        <li><a href="md5.html">MD5 Cipher</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                        <li><a href="https://github.com/simplecodetools">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Simple Code Tools. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/base64.js"></script>
+</body>
+</html> 
