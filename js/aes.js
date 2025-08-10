@@ -174,30 +174,8 @@ function encryptAdvanced(text, key, iv, keySize, mode, padding, outputFormat) {
 function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputFormat) {
     try {
         // Prepare key and IV
-        const keyObj = CryptoJS.enc.Utf8.parse(key.padEnd(keySize / 8, '0').substring(0, keySize / 8));
-        const ivObj = CryptoJS.enc.Utf8.parse(iv.padEnd(16, '0').substring(0, 16));
-
-        // Parse input based on format
-        let ciphertext;
-        switch (outputFormat) {
-            case 'Base64':
-                ciphertext = CryptoJS.lib.CipherParams.create({
-                    ciphertext: CryptoJS.enc.Base64.parse(encryptedText)
-                });
-                break;
-            case 'Hex':
-                ciphertext = CryptoJS.lib.CipherParams.create({
-                    ciphertext: CryptoJS.enc.Hex.parse(encryptedText)
-                });
-                break;
-            case 'Utf8':
-                ciphertext = CryptoJS.lib.CipherParams.create({
-                    ciphertext: CryptoJS.enc.Utf8.parse(encryptedText)
-                });
-                break;
-            default:
-                ciphertext = encryptedText;
-        }
+        const keyObj = CryptoJS.enc.Utf8.parse(key.padEnd(keySize / 8, '\0').substring(0, keySize / 8));
+        const ivObj = CryptoJS.enc.Utf8.parse(iv.padEnd(16, '\0').substring(0, 16));
 
         // Configure decryption options
         const options = {
@@ -206,12 +184,33 @@ function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputF
             padding: CryptoJS.pad[padding]
         };
 
-        // Decrypt
-        const decrypted = CryptoJS.AES.decrypt(ciphertext, keyObj, options);
+        let decrypted;
+        
+        if (outputFormat === 'Base64') {
+            // For Base64 input, use the direct decrypt method
+            decrypted = CryptoJS.AES.decrypt(encryptedText, keyObj, options);
+        } else {
+            // For other formats, create a CipherParams object
+            let ciphertext;
+            switch (outputFormat) {
+                case 'Hex':
+                    ciphertext = CryptoJS.enc.Hex.parse(encryptedText);
+                    break;
+                case 'Utf8':
+                default:
+                    ciphertext = CryptoJS.enc.Utf8.parse(encryptedText);
+            }
+            const cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: ciphertext
+            });
+            decrypted = CryptoJS.AES.decrypt(cipherParams, keyObj, options);
+        }
+
+        // Convert the decrypted data to a UTF-8 string
         const result = decrypted.toString(CryptoJS.enc.Utf8);
 
         if (!result) {
-            throw new Error('Decryption failed. Check your parameters.');
+            throw new Error('Decryption failed. Please check your key, IV, and that the input is properly formatted.');
         }
 
         return result;

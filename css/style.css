@@ -39,6 +39,18 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%;
+}
+
+/* Responsive container padding */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .tool-container {
+        padding: 1.5rem 16px;
+    }
 }
 
 /* Typography */
@@ -532,7 +544,15 @@ p {
 .tool-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 2rem 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .tool-container {
+        padding: 1.5rem 1rem;
+    }
 }
 
 .tool-header {
