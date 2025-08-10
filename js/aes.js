@@ -14,11 +14,29 @@ function togglePasswordVisibility(input, button) {
     }
 }
 
+// Toggle output format visibility based on operation
+function toggleOutputFormatVisibility(operation) {
+    const outputFormatGroup = document.getElementById('outputFormatGroup');
+    if (outputFormatGroup) {
+        outputFormatGroup.style.display = operation === 'encrypt' ? 'block' : 'none';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize password toggles
     document.querySelectorAll('.toggle-password').forEach(button => {
         const input = button.closest('.password-container').querySelector('input');
         button.addEventListener('click', () => togglePasswordVisibility(input, button));
+    });
+    
+    // Toggle output format when operation changes
+    const operationSelects = document.querySelectorAll('select[id$="Operation"]');
+    operationSelects.forEach(select => {
+        select.addEventListener('change', () => {
+            toggleOutputFormatVisibility(select.value);
+        });
+        // Initialize visibility
+        toggleOutputFormatVisibility(select.value);
     });
     
     // Tab switching functionality
@@ -74,16 +92,24 @@ function processBasicForm() {
     const resultDiv = document.getElementById('basicResult');
     const resultText = document.getElementById('basicResultText');
 
-    if (!text || !key) {
-        showError('Please enter both text and key.');
+    if (!text) {
+        showError('Please enter some text to process');
+        return;
+    }
+
+    if (!key) {
+        showError('Please enter a secret key');
         return;
     }
 
     try {
         let result;
         if (operation === 'encrypt') {
-            result = encryptBasic(text, key);
+            // For basic encryption, use default settings (CBC, Pkcs7, 256-bit key)
+            const iv = generateRandomIV();
+            result = encryptAdvanced(text, key, iv, 256, 'CBC', 'Pkcs7', 'Base64');
         } else {
+            // For decryption, use Base64 input format
             result = decryptBasic(text, key);
         }
 
@@ -91,8 +117,8 @@ function processBasicForm() {
         resultDiv.style.display = 'block';
         showSuccess('Operation completed successfully!');
     } catch (error) {
-        showError('Error: ' + error.message);
-        resultDiv.style.display = 'none';
+        showError('An error occurred: ' + error.message);
+        console.error(error);
     }
 }
 
@@ -118,9 +144,11 @@ function processAdvancedForm() {
     try {
         let result, info;
         if (operation === 'encrypt') {
+            // For encryption, use the selected output format
             result = encryptAdvanced(text, key, iv, keySize, mode, padding, outputFormat);
             info = `Key Size: ${keySize} bits\nMode: ${mode}\nPadding: ${padding}\nOutput Format: ${outputFormat}\nIV: ${iv}`;
         } else {
+            // For decryption, use the selected output format to determine input format
             result = decryptAdvanced(text, key, iv, keySize, mode, padding, outputFormat);
             info = `Key Size: ${keySize} bits\nMode: ${mode}\nPadding: ${padding}\nInput Format: ${outputFormat}\nIV: ${iv}`;
         }
@@ -290,7 +318,6 @@ function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputF
                 result = resultArray.join('');
             }
         } catch (e) {
-            console.error('Error converting decrypted data to string:', e);
             // If string conversion fails, try to get raw bytes
             const words = decrypted.words;
             const sigBytes = decrypted.sigBytes;
@@ -324,7 +351,6 @@ function decryptAdvanced(encryptedText, key, iv, keySize, mode, padding, outputF
                     throw new Error('Decryption resulted in empty output');
                 }
             } catch (e) {
-                console.error('Final decryption attempt failed:', e);
                 // Provide detailed error information
                 const error = new Error('Decryption failed. Please verify:');
                 error.details = {
