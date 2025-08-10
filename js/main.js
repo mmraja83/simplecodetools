@@ -322,3 +322,16 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style); 
+
+// Tool Navigation Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const toolSelector = document.querySelector('.tool-selector');
+    if (toolSelector) {
+        toolSelector.addEventListener('change', function() {
+            const selectedTool = this.value;
+            if (selectedTool) {
+                window.location.href = selectedTool;
+            }
+        });
+    }
+}); 

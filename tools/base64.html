@@ -18,7 +18,14 @@
                 </div>
                 <nav class="nav">
                     <ul>
-                        <li><a href="../index.html#tools">Tools</a></li>
+                        <li>
+                            <label for="toolSelector" class="sr-only">Select tool</label>
+                            <select id="toolSelector" class="tool-selector">
+                                <option value="aes.html">AES Cipher</option>
+                                <option value="base64.html" selected>Base64 Cipher</option>
+                                <option value="md5.html">MD5 Cipher</option>
+                            </select>
+                        </li>
                         <li><a href="../index.html#about">About</a></li>
                         <li><a href="../index.html#contact">Contact</a></li>
                     </ul>
@@ -28,35 +35,7 @@
     </header>
 
     <main class="tool-container">
-        <!-- Tool Navigation Bar -->
-        <nav class="tool-nav">
-            <div class="container">
-                <a href="../index.html" class="tool-nav-home">
-                    <span class="tool-nav-home-icon">🏠</span>
-                    <span>Home</span>
-                </a>
-                <ul class="tool-nav-list">
-                    <li class="tool-nav-item">
-                        <a href="aes.html" class="tool-nav-link">
-                            <span class="tool-nav-icon">🔐</span>
-                            <span class="tool-nav-text">AES Cipher</span>
-                        </a>
-                    </li>
-                    <li class="tool-nav-item">
-                        <a href="base64.html" class="tool-nav-link active">
-                            <span class="tool-nav-icon">📝</span>
-                            <span class="tool-nav-text">Base64 Cipher</span>
-                        </a>
-                    </li>
-                    <li class="tool-nav-item">
-                        <a href="md5.html" class="tool-nav-link">
-                            <span class="tool-nav-icon">🔒</span>
-                            <span class="tool-nav-text">MD5 Cipher</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+
 
         <div class="tool-header">
             <h1>📝 Base64 Cipher</h1>
@@ -224,6 +203,7 @@
         </div>
     </footer>
 
+    <script src="../js/main.js"></script>
     <script src="../js/base64.js"></script>
 </body>
 </html> 
